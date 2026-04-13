@@ -5,7 +5,9 @@
 #include "Windows.h"
 #include "Console/console.h"
 #include "Canvas/canvas.h"
+#include "Canvas/Window/windows.h"
 #include "types.h"
+#include "Canvas/Window/otherWindow.h"
 
 // Methods
 // -- Core loop
@@ -19,6 +21,8 @@ void navigateButtons(AppState& state, int dx, int dy);
 int main(int argc, char* argv[])
 {
     AppState state;
+    state.windows.push_back(std::make_unique<homeWindow>());
+    state.windows.push_back(std::make_unique<otherWindow>());
     state.running = true;
     
     console::enableAnsi();
@@ -54,7 +58,8 @@ void render(const AppState& state)
     
     for (int i = 0; i < state.buttons.size(); i++)
         canvas::drawButton(c, state.buttons[i], i == state.selectedButton);
-    
+
+    state.windows[state.activeWindow]->render(c, CONTENT_X, CONTENT_Y, CONTENT_W, CONTENT_H);
     canvas::flush(c);
 }
 
@@ -90,6 +95,9 @@ void processInput(AppState& state)
             break;
         case VK_RIGHT:
             navigateButtons(state, 1, 0);
+            break;
+        case VK_RETURN:
+            state.buttons[state.selectedButton].action(state);
             break;
         }
         // handle other keys here, e.g. VK_LEFT, VK_RIGHT, 'A', etc.

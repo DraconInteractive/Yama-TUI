@@ -1,4 +1,7 @@
 C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\Canvas\canvas.cpp;C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\x64\Debug\canvas.obj
+C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\Canvas\Window\baseWindow.cpp;C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\x64\Debug\baseWindow.obj
+C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\Canvas\Window\homeWindow.cpp;C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\x64\Debug\homeWindow.obj
+C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\Canvas\Window\otherWindow.cpp;C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\x64\Debug\otherWindow.obj
 C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\Console\console.cpp;C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\x64\Debug\console.obj
 C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\CPPYama.cpp;C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\x64\Debug\CPPYama.obj
 C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\Input\input.cpp;C:\Users\pmc10\RiderProjects\CPPYama\CPPYama\x64\Debug\input.obj

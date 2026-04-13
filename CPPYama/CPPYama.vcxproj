@@ -154,12 +154,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Canvas\canvas.cpp" />
+    <ClCompile Include="Console\console.cpp" />
     <ClCompile Include="CPPYama.cpp" />
+    <ClCompile Include="Input\input.cpp" />
+    <ClCompile Include="Render\render.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Canvas\" />
-    <Folder Include="Input\" />
-    <Folder Include="Render\" />
+    <ClInclude Include="Canvas\canvas.h" />
+    <ClInclude Include="Console\console.h" />
+    <ClInclude Include="Input\input.h" />
+    <ClInclude Include="Render\render.h" />
+    <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

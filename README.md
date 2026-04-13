@@ -61,7 +61,7 @@ updateState() → render() → processInput()
 
 ## Key Bindings
 
-| Key | Action |~~~~
+| Key | Action |
 |---|---|
 | Arrow keys | Navigate buttons |
 | Enter | Activate selected button |

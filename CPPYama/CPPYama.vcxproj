@@ -156,6 +156,11 @@
   <ItemGroup>
     <ClCompile Include="CPPYama.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Canvas\" />
+    <Folder Include="Input\" />
+    <Folder Include="Render\" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

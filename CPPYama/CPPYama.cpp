@@ -4,12 +4,17 @@
 
 #include "Windows.h"
 
+// Const Definitions
+constexpr int CANVAS_WIDTH  = 40;
+constexpr int CANVAS_HEIGHT = 20;
+
 // Struct Definitions
 struct Canvas
 {
     int width;
     int height;
     std::vector<char> cells;
+    std::vector<bool> highlighted;
 };
 
 struct Button
@@ -25,8 +30,9 @@ struct AppState
     int window = 0;
     std::vector<std::string> windows = {"Home", "NotHome"};
     std::vector<Button> buttons = {
-        {"Home",    2, 4},
-        {"Quit",    2, 5},
+        {"Home",    CANVAS_WIDTH - 20, 1},
+        { "Other",  CANVAS_WIDTH - 11, 1},
+        {"Quit",    CANVAS_WIDTH - 10, CANVAS_HEIGHT - 2}, // 10 = [ Quit ] (8) + Buffer (2)
     };
     int selectedButton = 0;
 };
@@ -49,9 +55,8 @@ void drawBox(Canvas& c, int x, int y, int w, int h);
 void drawButton(Canvas& c, const Button& btn, bool selected);
 void flushCanvas(const Canvas& c);
 
-// Const Definitions
-constexpr int CANVAS_WIDTH  = 40;
-constexpr int CANVAS_HEIGHT = 20;
+// -- Navigation
+void navigateButtons(AppState& state, int dx, int dy);
 
 int main(int argc, char* argv[])
 {
@@ -67,7 +72,8 @@ int main(int argc, char* argv[])
         render(state);
         processInput(state);
     }
-    
+
+    std::cout << "\x1b[?25h";
     return 0;
 }
 
@@ -82,11 +88,16 @@ void render(const AppState& state)
 {
     Canvas c = makeCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     drawBox(c, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);         // outer frame
-    drawString(c, 1, 1, "My Terminal App");  // title
-    for (int i = 0; i < buttons.size(); i++)
-        drawButton(c, buttons[i], i == state.selectedButton);
+    for (int i = 1; i < CANVAS_WIDTH - 2; i++)
+    {
+        drawChar(c, i, 2, '-');
+    }
+    drawString(c, 2, 1, "Yama TUI");  // title
+    
+    for (int i = 0; i < state.buttons.size(); i++)
+        drawButton(c, state.buttons[i], i == state.selectedButton);
+    
     flushCanvas(c);
-
 }
 
 void processInput(AppState& state)
@@ -110,11 +121,18 @@ void processInput(AppState& state)
         case VK_ESCAPE:
             state.running = false;
             break;
-            
-        }
-        if (key == VK_ESCAPE)
-        {
-            
+        case VK_UP:
+            navigateButtons(state, 0, -1);
+            break;
+        case VK_DOWN:
+            navigateButtons(state, 0, 1);
+            break;
+        case VK_LEFT:
+            navigateButtons(state, -1, 0);
+            break;
+        case VK_RIGHT:
+            navigateButtons(state, 1, 0);
+            break;
         }
         // handle other keys here, e.g. VK_LEFT, VK_RIGHT, 'A', etc.
     }
@@ -151,16 +169,18 @@ Canvas makeCanvas(int w, int h)
     Canvas newCanvas;
     newCanvas.width = w;
     newCanvas.height = h;
-    // TODO setup cells
+    newCanvas.cells.assign(w * h, ' ');
+    newCanvas.highlighted.assign(w * h, false);
+    return newCanvas;
 }
 
 void drawChar(Canvas& c, int x, int y, char ch)
 {
-    if (x < 0 || y < 0 || x > c.width || y > c.height)
+    if (x < 0 || y < 0 || x >= c.width || y >= c.height)
     {
         return;
     }
-    c.cells[y * c.height + x] = ch;
+    c.cells[y * c.width + x] = ch;
 }
 
 void drawString(Canvas& c, int x, int y, const std::string& s)
@@ -173,27 +193,127 @@ void drawString(Canvas& c, int x, int y, const std::string& s)
 
 void drawBox(Canvas& c, int x, int y, int w, int h)
 {
-    // TODO add this
+    // Corners
+    drawChar(c, x,         y,         '+');                              
+    drawChar(c, x + w - 1, y,         '+');           
+    drawChar(c, x,         y + h - 1, '+');
+    drawChar(c, x + w - 1, y + h - 1, '+');
+
+    // Top and bottom edges
+    for (int i = 1; i < w - 1; i++)
+    {
+        drawChar(c, x + i, y,         '-');
+        drawChar(c, x + i, y + h - 1, '-');
+    }
+
+    // Left and right edges
+    for (int i = 1; i < h - 1; i++)
+    {
+        drawChar(c, x,         y + i, '|');
+        drawChar(c, x + w - 1, y + i, '|');
+    }
 }
 
 void drawButton(Canvas& c, const Button& btn, bool selected)
 {
-    // TODO add this
+    const std::string text = "[ " + btn.label + " ]";
+    drawString(c, btn.x, btn.y, text);
+
+    if (selected)
+    {
+        for (int i = 0; i < static_cast<int>(text.length()); i++)
+        {
+            if (btn.x + i < c.width)
+                c.highlighted[btn.y * c.width + btn.x + i] = true;
+        }
+    }
 }
 
 void flushCanvas(const Canvas& c)
 {
-    std::cout << "\x1b[2J"; // clear screen
+    std::cout << "\x1b[?25l"; // hide cursor
+    // std::cout << "\x1b[2J"; // clear screen
     std::cout << "\x1b[H";  // move cursor to top-left
+    bool doHighlight = false;
+    
     for (int y = 0; y < c.height; y++)
     {
         for (int x = 0; x < c.width; x++)
         {
-            std::cout << c.cells[y * c.height + x];
+            bool cellHighlight = c.highlighted[y * c.width + x];
+            if (cellHighlight && !doHighlight)
+            {
+                doHighlight = true;
+                std::cout << "\x1b[7m";
+            }
+            else if (!cellHighlight && doHighlight)
+            {
+                doHighlight = false;
+                std::cout << "\x1b[0m";
+            }
+
+            std::cout << c.cells[y * c.width + x];
         }
         std::cout << "\n";
     }
+    std::cout << "\x1b[?25h"; // show cursor
     std::cout.flush();
 }
 
 #pragma endregion 
+
+#pragma region Navigation
+
+void navigateButtons(AppState& state, int dx, int dy)
+{
+    if (state.buttons.empty() || (dx == 0 && dy == 0))
+    {
+        return;
+    }
+
+    // Get nearest neighbour
+    const Button& current = state.buttons[state.selectedButton];
+    int bestIndex = -1;
+    int bestScore = INT_MAX;
+
+    for (int i = 0; i < static_cast<int>(state.buttons.size()); i++)
+    {
+        if (i == state.selectedButton) continue;
+
+        const Button& candidate = state.buttons[i];
+        int relX = candidate.x - current.x;
+        int relY = candidate.y - current.y;
+
+        // Validate direction
+        if (dy != 0)
+        {
+            if (dy > 0 && relY <= 0) continue;
+            if (dy < 0 && relY >= 0) continue;
+        }
+        if (dx != 0)
+        {
+            if (dx > 0 && relX <= 0) continue;
+            if (dx < 0 && relX >= 0) continue;
+        }
+
+        // Disincentivised diagonals
+        /*
+        int score = (dy != 0)
+              ? abs(relY) * 100 + abs(relX)
+              : abs(relX) * 100 + abs(relY);
+              */
+        int score = abs(relY) + abs(relX);
+        if (score < bestScore)
+        {
+            bestScore = score;
+            bestIndex = i;
+        }
+    }
+
+    if (bestIndex != -1)
+    {
+        state.selectedButton = bestIndex;
+    }
+}
+
+#pragma endregion

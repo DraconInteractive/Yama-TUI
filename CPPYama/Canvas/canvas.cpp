@@ -69,9 +69,13 @@ void canvas::drawButton(Canvas& c, const Button& btn, bool selected)
 
 void canvas::flush(const Canvas& c)
 {
-    std::cout << "\x1b[?25l"; // hide cursor
-    // std::cout << "\x1b[2J"; // clear screen
-    std::cout << "\x1b[H";  // move cursor to top-left
+    std::string out;
+    out.reserve(c.width * c.height * 2 + 128); // Add sensible buffer for button highlighting. Increase later if required
+    
+    out += "\x1b[?25l"; // hide cursor
+    out += "\x1b[2J"; // clear screen
+    out += "\x1b[H";  // move cursor to top-left
+    
     bool doHighlight = false;
     
     for (int y = 0; y < c.height; y++)
@@ -82,18 +86,22 @@ void canvas::flush(const Canvas& c)
             if (cellHighlight && !doHighlight)
             {
                 doHighlight = true;
-                std::cout << "\x1b[7m";
+                out += "\x1b[7m";
             }
             else if (!cellHighlight && doHighlight)
             {
                 doHighlight = false;
-                std::cout << "\x1b[0m";
+                out += "\x1b[0m";
             }
 
-            std::cout << c.cells[y * c.width + x];
+            out += c.cells[y * c.width + x];
         }
-        std::cout << "\n";
+        out += "\n";
     }
-    std::cout << "\x1b[?25h"; // show cursor
+    
+    out += "\x1b[0m";    // reset attributes
+    out += "\x1b[?25h"; // show cursor
+    
+    std::cout << out;
     std::cout.flush();
 }

@@ -1,7 +1,18 @@
 ﻿#include "otherWindow.h"
 #include "../canvas.h"
 
-void otherWindow::render(Canvas& c, int x, int y, int w, int h) const
+void otherWindow::render(Canvas& c) const
 {
-    canvas::drawString(c, x, y, "This is different content!");
+    canvas::drawString(c, posX, posY, "This is different content!");
 }
+
+void otherWindow::onShow(int x, int y, int w, int h)
+{
+    baseWindow::onShow(x, y, w, h);
+}
+
+void otherWindow::onHide()
+{
+    
+}
+

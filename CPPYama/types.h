@@ -7,8 +7,8 @@
 #include "Canvas/Window/baseWindow.h"
 
 // Total canvas
-constexpr int CANVAS_WIDTH  = 40;                                        
-constexpr int CANVAS_HEIGHT = 20;
+constexpr int CANVAS_WIDTH  = 80;                                        
+constexpr int CANVAS_HEIGHT = 40;
 
 // Window Bounds
 constexpr int CONTENT_X = 2;
@@ -29,19 +29,6 @@ struct Button
     std::function<void(AppState&)> action;
 };
 
-struct AppState
-{
-    bool running = true;
-    int activeWindow = 0;
-    std::vector<std::unique_ptr<baseWindow>> windows;
-    std::vector<Button> buttons = {
-        {"Home",    CANVAS_WIDTH - 20, 1, [](AppState& s) { s.activeWindow = 0; }},
-        { "Other",  CANVAS_WIDTH - 11, 1, [](AppState& s) { s.activeWindow = 1; }},
-        {"Quit",    CANVAS_WIDTH - 10, CANVAS_HEIGHT - 2, [](AppState& s){ s.running = false; }}, // 10 = [ Quit ] (8) + Buffer (2)
-    };
-    int selectedButton = 0;
-};
-
 struct Canvas
 {
     int width;
@@ -50,7 +37,17 @@ struct Canvas
     std::vector<bool> highlighted;
 };
 
-struct Window
+struct AppState
 {
-    std::string name;
+    bool running = true;
+    int lastActiveWindow = -1;
+    int activeWindow = -1; // Init as no selected window
+    std::vector<std::unique_ptr<baseWindow>> windows;
+    std::vector<Button> globalButtons = {
+        {"Home",    CANVAS_WIDTH - 20, 1, [](AppState& s) { s.activeWindow = 0; }},
+        { "Other",  CANVAS_WIDTH - 11, 1, [](AppState& s) { s.activeWindow = 1; }},
+        {"Quit",    CANVAS_WIDTH - 10, CANVAS_HEIGHT - 2, [](AppState& s){ s.running = false; }}, // 10 = [ Quit ] (8) + Buffer (2)
+    };
+    std::vector<Button> allButtons;
+    int selectedButton = 0;
 };

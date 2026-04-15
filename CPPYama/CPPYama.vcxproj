@@ -234,7 +234,6 @@
     <ClCompile Include="Console\console.cpp" />
     <ClCompile Include="CPPYama.cpp" />
     <ClCompile Include="Input\input.cpp" />
-    <ClCompile Include="Render\render.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Canvas\canvas.h" />
@@ -244,7 +243,6 @@
     <ClInclude Include="Canvas\Window\windows.h" />
     <ClInclude Include="Console\console.h" />
     <ClInclude Include="Input\input.h" />
-    <ClInclude Include="Render\render.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
